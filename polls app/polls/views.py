@@ -4,53 +4,28 @@ from .models import Choice, Question
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.db.models import F
+from django.views import generic
 
-# Возвращает страницу с опросами
-def index(request):
-    # Забираем первые 5 вопросов из базы данных, отсоритрованных по дате публикации
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    # output = ", ".join([q.question_text for q in latest_question_list])
-    context = {
-        "latest_question_list": latest_question_list
-    }
-    return render(request=request, template_name="polls/index.html", context=context)
-    """
-    Поговорим о том, что здесь происходит.
-    latest_question_list по прежнему извлекает первые 5 вопросов из базы данных с помощью API.
-    В предыдущей реализации html код был захардкожен в HttpResponse, что не является хорошей практикой. Если поместить html код дейсвительно реалной страницы, то мы получим очень очень много кода html внутри python кода.
-    Для того, чтобы отделить python код и html код существует template(шаблоны)
-    В mysite.setting.py есть параметр TEMPLATES который описывает, как DJANGO будет загружать и отображать шаблоны.
+"""
+Система общих представлений позволяет воспользоваться готовым представлением, которые решают стандартные задачи: получение данных из бд в соотвествии с параметром
+переданным в URL, возвращение отрисованного шаблона
+И,соотвественно, если базовое представление "из коробки" нам подходит, то мы можем воспользоваться им, а не изобретать велосипед.
+"""
+
+class IndexView(generic.ListView):
+    template_name = "polls/index.html"
+    context_object_name = "latest_question_list"
     
-    Теперь у нас выполняются следующие шаги:
-    1. Загружается HTML шаблон, который находится в polls/templates/polls/index.html
-    2. Мы заполняем контекст записями из базы данных.(Помещаем внутри шаблона данные) context = Mapping[str, Any]
-    3. Функция render принимает объект запроса, имя шаблона и словарь(контекст) в качестве необязательного третьего аргумента и возвращает HttpResponse
-    
-    
-    """
+    def get_queryset(self):
+        return Question.objects.order_by("-pub_date")[:5]
 
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = "polls/detail.html"
 
-# Возвращает страницу с деталями опроса 
-
-def detail(request, question_id):
-    
-    """
-    Частой практикой является запрашивать get и в случае несуществыования объекта выдавать 404 ошибку. Есть сокращение get_object_or_404()
-    Вместо этого:
-    # try:
-    #     question = Question.objects.get(pk=question_id)
-    # except:
-    #     raise Http404("Question does not exist")
-    # return render(request, "polls/detail.html", {"question": question})
-    """
-    # Имеем:
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request=request, template_name="polls/detail.html", context={"question": question})
-
-
-def result(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request=request, template_name="polls/results.html", context={"question": question})
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = "polls/results.html"
 
 """
 Представление, которое обарабатывает POST запрос с отправленной формой, где выбран
