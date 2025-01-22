@@ -18,7 +18,9 @@ class Question(models.Model):
         return self.question_text
     # Добавили пользовательский метод был ли опубликован вопрос недавно?
     def was_published_recently(self):
-        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+        now = timezone.now()
+        # return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+        return self.pub_date >= now - datetime.timedelta(days=1) and self.pub_date <= now
     
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
