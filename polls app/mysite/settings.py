@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes', # фреймворк типов данных?
     'django.contrib.sessions', # фреймворк сессий
     'django.contrib.messages', # фреймворк сообщений
-    'django.contrib.staticfiles', # фреймврк для работы со статическими файлами
+    'django.contrib.staticfiles', # фреймврк для работы со статическими файлами.Он собирает статические файлы из каждого приложения в одно место, которое можно будет легко обслуживать.
     'polls' # Приложение опросы, которое мы подключаем к нашему экземпляру Django
 ]
 
@@ -63,7 +63,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
